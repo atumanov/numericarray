@@ -12,17 +12,23 @@ void add_arrays(py::array_t<double> input1, py::array_t<double> input2) {
     if (buf1.size != buf2.size)
         throw std::runtime_error("Input shapes must match");
 
-    double *ptr1 = (double *) buf1.ptr;
+    volatile double *ptr1 = (double *) buf1.ptr;
     double *ptr2 = (double *) buf2.ptr;
 
-    double new_val;
+    union bits { double f; int64_t i; };
+    bits old_val, new_val;
     for (size_t idx = 0; idx < buf1.shape[0]; idx++) {
-      double old_val = ptr1[idx];
       do {
-	new_val = ptr1[idx] + ptr2[idx];
-      } while (!__sync_bool_compare_and_swap(reinterpret_cast<uint64_t*>(&ptr1[idx]),
-					     *reinterpret_cast<uint64_t*>(&old_val),
-					     *reinterpret_cast<uint64_t*>(&new_val)));
+	old_val.f = ptr1[idx];
+	new_val.f = old_val.f + ptr2[idx];
+	// On IA64/x64, adding a PAUSE instruction in compare/exchange loops
+        // is recommended to improve performance.  (And it does!)
+#if (defined(__i386__) || defined(__amd64__))
+        __asm__ __volatile__ ("pause\n");
+#endif
+      } while (!__sync_bool_compare_and_swap(reinterpret_cast<volatile int64_t*>(&ptr1[idx]),
+					     old_val.i,
+					     new_val.i));
     }
 }
 
