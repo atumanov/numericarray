@@ -21,8 +21,8 @@ void add_arrays(py::array_t<double> input1, py::array_t<double> input2) {
       do {
 	new_val = ptr1[idx] + ptr2[idx];
       } while (__sync_bool_compare_and_swap(reinterpret_cast<uint64_t*>(&ptr1[idx]),
-                                            *reinterpret_cast<uint64_t*>(&old_val),
-                                            *reinterpret_cast<uint64_t*>(&new_val)));
+					    *reinterpret_cast<uint64_t*>(&old_val),
+					    *reinterpret_cast<uint64_t*>(&new_val)));
     }
 }
 
