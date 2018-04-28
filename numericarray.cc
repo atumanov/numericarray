@@ -16,12 +16,15 @@ void adds_AVX512(float *y, const float *x, const ptrdiff_t n) {
   #pragma omp parallel for if ( (n > TH_OMP_OVERHEAD_THRESHOLD_VEC_AVX512) && ( 0 == omp_flag) )private (i)
   for (i=0; i<=((n)-16); i+=16) {
     __m512 YMM0;
-    YMM0 = _mm512_loadu_ps(x+i);
+    __m512 YMM1;
+    YMM0 = _mm512_loadu_ps(y+i);
+    YMM1 = _mm512_loadu_ps(x+i);
+    YMM0 = _mm512_add_ps(YMM1, YMM0);
     _mm512_storeu_ps(y+i, YMM0);
   }
   off = (n) - ((n)%16);
   for (i=off; i<(n); i++) {
-    y[i] = x[i];
+    y[i] += x[i];
   }
 }
 

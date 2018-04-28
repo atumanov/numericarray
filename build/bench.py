@@ -20,7 +20,7 @@ bt = torch.from_numpy(b)
 
 t1 = time.time()
 for i in range(100):
-    a += b
+    at += bt
 print("time = ", time.time() - t1)
 
 print("adding with numericarray")
