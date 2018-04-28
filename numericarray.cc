@@ -32,7 +32,7 @@ void add_arrays(py::array_t<float> input1, py::array_t<float> input2) {
     throw std::runtime_error("Number of dimensions must be one");
 
 
-  volatile float *ptr1 = (float *) buf1.ptr;
+  float *ptr1 = (float *) buf1.ptr;
   float *ptr2 = (float *) buf2.ptr;
 
   adds_AVX512(ptr1, ptr2, buf1.shape[0]);
