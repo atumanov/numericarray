@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.12)
-project(atomicarray)
+project(numericarray)
 
 add_subdirectory(pybind11)
-pybind11_add_module(atomicarray atomicarray.cc)
+pybind11_add_module(numericarray numericarray.cc)
